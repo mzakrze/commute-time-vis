@@ -1,13 +1,9 @@
 'use strict';
 
-var DirectionsService = require('@google/maps/DirectionService')
 
 var mongoose = require('mongoose'),
   Task = mongoose.model('Tasks');
-  var googleMapsClient = require('@google/maps').createClient({
-    key: 'AIzaSyCjjme4cNotK8vxBHtxdv8Dw_JwpZ2O-o8'
-  });
-const {google} = require('googleapis');
+
 exports.list_all_tasks = function(req, res) {
   Task.find({}, function(err, task) {
 
@@ -21,26 +17,7 @@ exports.routes = function(req, res) {
   let origin = 'cos'
   let destination = 'cos2'
   let departureTime = new Date()
-  var directionsService = new google.maps.DirectionsService();
 
-  let googleRequest = {
-    origin,
-    destination,
-    provideRouteAlternatives: true,
-    travelMode: 'TRANSIT',
-    drivingOptions: {
-      departureTime,
-      trafficModel: 'pessimistic'
-    }
-  }
-
-  directionsService.route(request, function(result, status) {
-    if (status == 'OK') {
-      directionsDisplay.setDirections(result);
-      res.json(result);
-    }
-    res.json(result);
-  });
   let test_response =
   {
        "grzesiu": {
@@ -62,11 +39,11 @@ exports.routes = function(req, res) {
            ]
        }
   }  ;
-  // Task.find({}, function(err, task) {
-  //   if (err)
-  //     res.send(err);
-  //   res.json(test_response);
-  // });
+  Task.find({}, function(err, task) {
+    if (err)
+      res.send(err);
+    res.json(test_response);
+  });
 };
 
 exports.routes_add = function(req, res) {
