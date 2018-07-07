@@ -19,7 +19,7 @@ var webpackConfig = {
   devtool: 'source-map',
   module: {
     loaders: [
-      { test: /\.(js|jsx)$/, loader: 'babel-loader', exclude: /node_modules/ },
+      { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ },
       { test: /\.json$/, loader: 'json-loader'},
       { test: /\.css$/, loader: "style-loader!css-loader?importLoaders=1" },
       { test: /\.(scss)$/, use: [
@@ -36,16 +36,7 @@ var webpackConfig = {
           { loader: 'sass-loader'}
         ]}
     ],
-    rules: [
-      
-        {
-          test: /\.(jpe?g|png|gif|svg)$/i,
-          loaders: [
-            'file?hash=sha512&digest=hex&name=[hash].[ext]',
-            'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
-          ]
-        } 
-    ]
+
   },
   devServer: {
     port: 3000,
