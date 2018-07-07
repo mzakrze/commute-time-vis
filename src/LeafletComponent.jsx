@@ -1,4 +1,4 @@
-/* @flow */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -6,7 +6,14 @@ import ReactDOM from 'react-dom';
 export default class LeafletComponent extends React.Component {
 
     componentDidMount(){
-        var mymap = L.map('leaftlet-map-id').setView([51.505, -0.09], 13);
+        var mymap = L.map('leaftlet-map-id',{
+            contextmenu: true,
+            contextmenuWidth: 140,
+            contextmenuItems: [{
+                text: 'Show coordinates',
+                callback: () => {console.log('im in callback')}
+            }]
+	    }).setView([51.505, -0.09], 13);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
             maxZoom: 18,
@@ -42,6 +49,12 @@ export default class LeafletComponent extends React.Component {
         }
 
         mymap.on('click', onMapClick);
+
+        // mymap.on('contextmenu',function(){
+        //     let p = L.popup();
+        //     p.setContent('<p>Hello world!<br />This is a nice popup.</p>'); 
+        //     p.openOn(mymap);
+        // });
     }
 
     render() {

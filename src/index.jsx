@@ -1,4 +1,4 @@
-/* @flow */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -13,7 +13,7 @@ class App extends React.Component {
                 <div style={{display:'inline-block', marginRight:'20px'}}>
                     <LeafletComponent />
                 </div>
-                <div style={{display:'inline-block'}}>
+                <div style={{display:'inline-block', width: '600px'}}>
                     <FormComponent />
                 </div>
             </span>

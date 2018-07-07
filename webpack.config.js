@@ -7,7 +7,7 @@ const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
 })
 const fs = require('fs')
  // node@8.0.0
- // npm@5.0.0
+ // npm@6.1.0
  // npm zainstalowany globalnie
 
 var webpackConfig = {
