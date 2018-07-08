@@ -20,10 +20,11 @@
 */
 
 (function() {
-
-    console.log('in handlers.js')
-
     var URL = require("url");
+
+    var GoogleService = require('./google_service');
+
+    var googleApi = GoogleService.getGoogleApiAdapter();
 
     /*
     konwencja pseudo frameworka:
@@ -33,11 +34,35 @@
 
     var handleNameToCoordsRequest = function(request, response){
         var url = URL.parse(request.url);
+
+        var requestOk = true;
+        // TODO sprawdx żadanie -> parsuj url, request body itp
+
+        if(requestOk == false){
+            return null;
+        }
+
+        return function(){
+            var routes = googleApi.findRoutes()
+            .then(function(data){
+                console.log('routes resolved')
+                response.writeHead(200, {"Content-Type": "application/json"});
+                response.write(data);
+                response.end();
+            })
+            .catch(function(err){
+                console.log('routes rejected')
+                response.writeHead(500, {"Content-Type": "application/json"});
+                response.write(JSON.stringify({msg: "sory Dolores"}));
+                response.end();
+            });;
+        }
+
+        
     }
 
-
     var handleDoFindRoute = function(request, response){
-        
+
         
     }
 

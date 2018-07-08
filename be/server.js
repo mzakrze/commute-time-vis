@@ -11,7 +11,7 @@ http.createServer(function(request, response) {
     var dispatcher = dispatchers[i];
     var handler = dispatcher.apply(null, [request, response])
     if(handler != null){
-        handler.apply(url, request, response);
+        handler.apply(request, response);
         handled = true;
         break;
     }
