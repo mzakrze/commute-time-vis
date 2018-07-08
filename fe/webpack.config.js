@@ -13,7 +13,7 @@ const fs = require('fs')
 var webpackConfig = {
   entry: './src/index.jsx',
   output: {
-    path: '/dist',
+    path: '/src/src/dist',
     filename: 'bundle.js'
   },
   devtool: 'source-map',

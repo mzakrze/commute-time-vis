@@ -1,0 +1,25 @@
+version: '2'
+services:
+  client:
+    build:
+      context: ./fe/
+    command: node /src/index.js
+    volumes:
+      - ./fe/:/src
+      - /node_modules
+    working_dir: /src
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+  server:
+    build:
+      context: ./be/
+    command: node server.js
+    volumes:
+      - ./be/:/src
+      - /node_modules
+    working_dir: /src
+    ports:
+      - "8080:8080"
