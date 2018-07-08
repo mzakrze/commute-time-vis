@@ -41,9 +41,7 @@ export default class FormComponent extends React.Component {
     // TODO - members name must be unique
 
     handleFindRoutes(){
-        alert('not implemented yet')
-
-        let location = {lat: '12.34', lng: '56.67'};
+        let location = this.state.location;
         let users = {};
         for(let m of this.state.members){
             let name = m.name;
@@ -58,13 +56,18 @@ export default class FormComponent extends React.Component {
             location, users
         }
 
-        var requestBodyMock = "{\"location\":{\"lat\":\"12.34\",\"lng\":\"56.67\"},\"users\":{\"mariusz\":[\"Ksawer\u00F3w 23\",\"Politechnika Warszawska\"],\"grzesiek\":[\"Twarda 4\",\"Politechnika Warszawa\"]}}"
-
+        var requestBodyMock = "{\"location\":\"Wałbrzyska\",\"users\":{\"mariusz\":[\"Ksawer\u00F3w 23\",\"Politechnika Warszawska\"],\"grzesiek\":[\"Twarda 4\",\"Politechnika Warszawa\"]}}"
         requestBody = JSON.parse(requestBodyMock);
+
+        console.log('sending request:')
+        console.log(requestBody)
 
         fetch('/api/routes', { method: 'POST', body: JSON.stringify(requestBody) })
             .then(res => res.json())
-            .then(json => console.log(json));
+            .then(data => {
+                console.log('got response: ')
+                console.log(data)
+            });
     }
 
     renderNewLocationInput(){

@@ -9,10 +9,8 @@ http.createServer(function(request, response) {
   var dispatchers = handlers.getDispatchers();
   for(var i = 0; i < dispatchers.length; i++){
     var dispatcher = dispatchers[i];
-    var handler = dispatcher.apply(null, [request, response])
-    if(handler != null){
-        handler.apply(request, response);
-        handled = true;
+    handled = dispatcher.apply(null, [request, response]);
+    if(handled){
         break;
     }
   }
@@ -22,8 +20,6 @@ http.createServer(function(request, response) {
     response.write("404 Not Found\n");
     response.end();
   }
-
-
 }).listen(parseInt(port, 10));
 
 console.log("Http server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");

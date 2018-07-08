@@ -14,14 +14,11 @@
     const https = require('https');
     var querystring = require("querystring");
 
-    var findRoutes = function(origin, destination) {
-
-        origin = querystring.escape(origin) + "+Warszawa";
-        destination = querystring.escape(destination);
+    var findRoutes = function(userName, origin, destination) {
 
         var path = '/maps/api/directions/json' 
-            + '?origin=' + origin
-            + '&destination=' + destination 
+            + '?origin=' + querystring.escape(origin) + "+Warszawa"
+            + '&destination=' + querystring.escape(destination) 
             + '&departure_time=1531042237'
             + '&mode=transit'
             + '&key=AIzaSyAc3CsjQyaKgi07sSpzBM6oyZWhUkX_p78';
@@ -41,18 +38,22 @@
                 });
                 
                 resp.on('end', () => {
-                    res = data
-                    resolve(data);
+                    var result = {
+                        userName: userName,
+                        destination: destination,
+                        result: data
+                    }
+                    resolve(result);
                 });
             });
     
             req.on("error", (err) => {
-                console.log("Error: " + err.message);
+                console.error("Error: " + err.message);
                 reject(err);
             });
     
             req.end();
-        })
+        });
     }
 
     module.exports.getGoogleApiAdapter = function() {

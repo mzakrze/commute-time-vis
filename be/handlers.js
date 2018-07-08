@@ -26,49 +26,82 @@
 
     var googleApi = GoogleService.getGoogleApiAdapter();
 
-    /*
-    konwencja pseudo frameworka:
-    - dispatcher zwraca handlera - funkcję(req, resp), która obsłuży żądanie - albo null 
-    */
+
     var dispatchers = [];
 
-    var handleNameToCoordsRequest = function(request, response){
-        var url = URL.parse(request.url);
-
-        var requestOk = true;
-        // TODO sprawdx żadanie -> parsuj url, request body itp
-
-        console.log('url:', url)
-
-        if(requestOk == false){
-            return null;
-        }
-
-        return function(){
-            var routes = googleApi.findRoutes()
-            .then(function(data){
-                console.log('routes resolved')
-                response.writeHead(200, {"Content-Type": "application/json"});
-                response.write(data);
-                response.end();
-            })
-            .catch(function(err){
-                console.log('routes rejected')
-                response.writeHead(500, {"Content-Type": "application/json"});
-                response.write(JSON.stringify({msg: "sory Dolores"}));
-                response.end();
-            });;
-        }
-
-        
-    }
-
     var handleDoFindRoute = function(request, response){
-
+        var url = URL.parse(request.url);
         
+        var requestBody = '';
+        request.on('data', function (data) {
+            requestBody += data;
+        });
+        request.on('end', function () {
+            requestBody = JSON.parse(requestBody);
+            
+            if(!requestBody.location || !requestBody.users){
+                return null;
+            }
+
+            var userNames = Object.keys(requestBody.users);
+
+            var result = {};
+            var promises = [];
+            var promisesToBeDone = 0;
+            var isSuccess = true;
+            var responseBody = {};
+
+            function allPromisesDoneCallback(){
+                if(isSuccess){
+                    response.writeHead(200, {"Content-Type": "application/json"});
+                    response.write(JSON.stringify(responseBody));
+                    response.end();
+                } else {
+                    response.writeHead(500, {"Content-Type": "application/json"});
+                    response.write(JSON.stringify({msg: 'Sorry, unexpected error'}));
+                    response.end();
+                }
+            }
+
+            // TODO - przepisać to jakoś sensownie
+            for(var i = 0; i < userNames.length; i++){
+                var userName = userNames[i]
+                var usersDesitinations = requestBody.users[userName];
+                
+                for(var j = 0; j < usersDesitinations.length; j++){
+                    var origin = requestBody.location;
+                    var destination = usersDesitinations[j]; 
+
+                    ++promisesToBeDone;
+                    googleApi.findRoutes(userName, origin, destination)
+                        .then(function(data) {
+                            var userName = data.userName;
+                            var destination = data.destination;
+                            var result = data.result;
+                            --promisesToBeDone;
+                            if(!responseBody[userName]){
+                                responseBody[userName] = {}
+                            }
+                            responseBody[userName][destination] = data;
+                            
+                            if(promisesToBeDone == 0){
+                                allPromisesDoneCallback()
+                            };                                
+                        })
+                        .catch(function(err){
+                            console.error(err)
+                            isSuccess = false;
+                            --promisesToBeDone;
+                            if(promisesToBeDone == 0){
+                                allPromisesDoneCallback()
+                            };
+                        })
+                }
+            }
+        });
     }
 
     module.exports.getDispatchers = function() {
-        return [handleDoFindRoute, handleNameToCoordsRequest];
+        return [handleDoFindRoute];
     }
 })();
