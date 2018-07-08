@@ -56,17 +56,11 @@ export default class FormComponent extends React.Component {
             location, users
         }
 
-        var requestBodyMock = "{\"location\":\"Wałbrzyska\",\"users\":{\"mariusz\":[\"Ksawer\u00F3w 23\",\"Politechnika Warszawska\"],\"grzesiek\":[\"Twarda 4\",\"Politechnika Warszawa\"]}}"
-        requestBody = JSON.parse(requestBodyMock);
-
-        console.log('sending request:')
-        console.log(requestBody)
-
         fetch('/api/routes', { method: 'POST', body: JSON.stringify(requestBody) })
             .then(res => res.json())
             .then(data => {
                 console.log('got response: ')
-                console.log(data)
+                console.log(JSON.stringify(data))
             });
     }
 
@@ -77,12 +71,30 @@ export default class FormComponent extends React.Component {
         }
         return (<div>
             Your new location: <br/>
-            <input type="text" placeholder="type new location" onChange={onChange} />
+            <input placeholder="type new location" value={this.state.location} onChange={onChange} />
             </div>);
     }
 
     renderFindRoutesButton(){
         return <button onClick={this.handleFindRoutes.bind(this)}>Ok - find the routes</button>;
+    }
+
+    renderSaveAndLoadSettingsButtons(){
+        const key = 'settings';
+        let saveAction = () => {
+            let stateAsJson = JSON.stringify(this.state);
+            console.log(stateAsJson)
+            localStorage.setItem(key, stateAsJson);
+        }
+        let loadAction = () => {
+            let stateAsJson = localStorage.getItem(key);
+            let newState = JSON.parse(stateAsJson);
+            this.setState(newState);
+        }
+        return [
+            <button onClick={saveAction}>Save settings</button>,
+            <button onClick={loadAction}>Load settings</button>
+        ];
     }
     
     renderMembersConfigInput(){
@@ -127,7 +139,7 @@ export default class FormComponent extends React.Component {
         placesInputs.push(<button onClick={handleAddNewPlace}>+</button>);
         return (<div style={{marginLeft: '10px', border: 'black solid 1px'}}>
             Name: <button onClick={handleDeleteMember}>-</button><br/>
-            <input placeholder="name" onChange={handleMemberNameChanged} />
+            <input placeholder="name" value={member.name} onChange={handleMemberNameChanged} />
             <div style={{marginLeft: '10px'}}>
             {placesInputs}
             </div>
@@ -158,14 +170,14 @@ export default class FormComponent extends React.Component {
 
     render(){
 
-        console.log('state:', this.state)
-
+        console.log(this.state)
         return <div>
             {this.renderNewLocationInput()}
             <hr />
             {this.renderMembersConfigInput()}
             <hr />
             {this.renderFindRoutesButton()}
+            {this.renderSaveAndLoadSettingsButtons()}
         </div>;
     }
 

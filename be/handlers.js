@@ -20,6 +20,7 @@
 */
 
 (function() {
+
     var URL = require("url");
 
     var GoogleService = require('./google_service');
@@ -82,7 +83,8 @@
                             if(!responseBody[userName]){
                                 responseBody[userName] = {}
                             }
-                            responseBody[userName][destination] = data;
+
+                            responseBody[userName][destination] = JSON.parse(result);
                             
                             if(promisesToBeDone == 0){
                                 allPromisesDoneCallback()
