@@ -12,12 +12,23 @@
 (function() {
     // https://nodejs.org/api/https.html
     const https = require('https');
+    var querystring = require("querystring");
 
-    var findRoutes = function() {
+    var findRoutes = function(origin, destination) {
+
+        origin = querystring.escape(origin) + "+Warszawa";
+        destination = querystring.escape(destination);
+
+        var path = '/maps/api/directions/json' 
+            + '?origin=' + origin
+            + '&destination=' + destination 
+            + '&departure_time=1531042237'
+            + '&mode=transit'
+            + '&key=AIzaSyAc3CsjQyaKgi07sSpzBM6oyZWhUkX_p78';
 
         var options = {
             hostname: 'maps.googleapis.com',
-            path: '/maps/api/directions/json?origin=Disneyland&destination=Universal+Studios+Hollywood4&key=AIzaSyAc3CsjQyaKgi07sSpzBM6oyZWhUkX_p78',
+            path: path,
             method: 'GET',
             async: false,
         }
