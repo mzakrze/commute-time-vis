@@ -1,24 +1,29 @@
-var express = require('express'),
-  app = express(),
-  port = process.env.PORT || 8080,
-  mongoose = require('mongoose'),
-  Task = require('./api/models/anyModel'), //created model loading here
-  bodyParser = require('body-parser');
+var http = require("http"),
+    port = process.argv[2] || 8080;
 
-// mongoose instance connection url connection
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/Tododb');
+var handlers = require('./handlers')
+
+http.createServer(function(request, response) {
+
+  var handled = false;
+  var dispatchers = handlers.getDispatchers();
+  for(var i = 0; i < dispatchers.length; i++){
+    var dispatcher = dispatchers[i];
+    var handler = dispatcher.apply(null, [request, response])
+    if(handler != null){
+        handler.apply(url, request, response);
+        handled = true;
+        break;
+    }
+  }
+
+  if(handled == false){
+    response.writeHead(404, {"Content-Type": "text/plain"});
+    response.write("404 Not Found\n");
+    response.end();
+  }
 
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+}).listen(parseInt(port, 10));
 
-
-var routes = require('./api/routes/anyRoute'); //importing route
-routes(app); //register the route
-
-
-app.listen(port);
-
-
-console.log('todo list RESTful API server started on: ' + port);
+console.log("Http server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
