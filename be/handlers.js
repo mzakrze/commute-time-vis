@@ -38,6 +38,8 @@
         var requestOk = true;
         // TODO sprawdx żadanie -> parsuj url, request body itp
 
+        console.log('url:', url)
+
         if(requestOk == false){
             return null;
         }

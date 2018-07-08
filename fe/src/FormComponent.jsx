@@ -1,6 +1,7 @@
 /* @flow */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import fetch from 'node-fetch';
 
 type Place = {
     id: number,
@@ -37,8 +38,33 @@ export default class FormComponent extends React.Component {
         }
     }
 
+    // TODO - members name must be unique
+
     handleFindRoutes(){
         alert('not implemented yet')
+
+        let location = {lat: '12.34', lng: '56.67'};
+        let users = {};
+        for(let m of this.state.members){
+            let name = m.name;
+            let places = [];
+            for(let p of m.places){
+                places.push(p.content)
+            }
+            users[name] = places;
+        }
+
+        let requestBody = {
+            location, users
+        }
+
+        var requestBodyMock = "{\"location\":{\"lat\":\"12.34\",\"lng\":\"56.67\"},\"users\":{\"mariusz\":[\"Ksawer\u00F3w 23\",\"Politechnika Warszawska\"],\"grzesiek\":[\"Twarda 4\",\"Politechnika Warszawa\"]}}"
+
+        requestBody = JSON.parse(requestBodyMock);
+
+        fetch('/api/routes', { method: 'POST', body: JSON.stringify(requestBody) })
+            .then(res => res.json())
+            .then(json => console.log(json));
     }
 
     renderNewLocationInput(){
@@ -53,15 +79,17 @@ export default class FormComponent extends React.Component {
     }
 
     renderFindRoutesButton(){
-        return <button onClick={this.handleFindRoutes}>Ok - find the routes</button>;
+        return <button onClick={this.handleFindRoutes.bind(this)}>Ok - find the routes</button>;
     }
     
     renderMembersConfigInput(){
         let handleAddNewMemberInput = () => {
-            let nextMemberId = this.state.nextMemberId + 1;
+            let nextMemberId = this.state.nextMemberId;
             let members = this.state.members.slice();
             members.push({id: nextMemberId, places: [], nextPlaceId: 0});
-            this.setState({ members, nextMemberId });
+            this.setState({ 
+                members: members, 
+                nextMemberId: nextMemberId + 1 });
         }
         let res = [<p>Type new members: </p>];
         for(let member of this.state.members){
@@ -107,8 +135,8 @@ export default class FormComponent extends React.Component {
         let onChange = (ev) => {
             let members = this.state.members.slice();
             let m = members.filter(e => e.id == memberId)[0];
-            let place = m.places.filter(p => p.id == place.id)[0];
-            place.content = ev.target.value;
+            let membersPlace = m.places.filter(p => p.id == place.id)[0];
+            membersPlace.content = ev.target.value;
             this.setState({ members });
         }
         let handleDeletePlace = () => {
@@ -126,6 +154,8 @@ export default class FormComponent extends React.Component {
     }
 
     render(){
+
+        console.log('state:', this.state)
 
         return <div>
             {this.renderNewLocationInput()}
