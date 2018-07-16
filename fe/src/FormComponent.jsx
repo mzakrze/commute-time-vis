@@ -61,6 +61,7 @@ export default class FormComponent extends React.Component {
             .then(data => {
                 console.log('got response: ')
                 console.log(JSON.stringify(data))
+                this.props.notify(this.state, data);
             });
     }
 

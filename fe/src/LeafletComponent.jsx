@@ -4,16 +4,13 @@ import ReactDOM from 'react-dom';
 
 
 export default class LeafletComponent extends React.Component {
+    mymap: any;
+
 
     componentDidMount(){
-        var mymap = L.map('leaftlet-map-id',{
-            contextmenu: true,
-            contextmenuWidth: 140,
-            contextmenuItems: [{
-                text: 'Show coordinates',
-                callback: () => {console.log('im in callback')}
-            }]
-	    }).setView([51.505, -0.09], 13);
+        this.mymap = L.map('leaftlet-map-id',{
+
+	    }).setView([52.237049, 21.017532], 12);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
             maxZoom: 18,
@@ -21,40 +18,39 @@ export default class LeafletComponent extends React.Component {
                 '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
                 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             id: 'mapbox.streets'
-        }).addTo(mymap);
+        }).addTo(this.mymap);
+    }
 
-        L.marker([51.5, -0.09]).addTo(mymap)
-            .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
-
-        L.circle([51.508, -0.11], 500, {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5
-        }).addTo(mymap).bindPopup("I am a circle.");
-
-        L.polygon([
-            [51.509, -0.08],
-            [51.503, -0.06],
-            [51.51, -0.047]
-        ]).addTo(mymap).bindPopup("I am a polygon.");
-
-
-        var popup = L.popup();
-
-        function onMapClick(e) {
-            popup
-                .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString())
-                .openOn(mymap);
+    componentWillReceiveProps({form, response}){
+        let members = form.members;
+        for(let m of form.members){
+            let usersPlaces = response[m.name];
+            for(let placeName of Object.keys(usersPlaces)){
+                let placeInstr = usersPlaces[placeName];
+                if(placeInstr.status != "OK"){
+                    console.error('For member ' + m.name + " place " + placeName + " not found");
+                    continue;
+                }
+                let steps = placeInstr["routes"][0]["legs"][0]["steps"];
+                let points = [];
+                let isFirst = true;
+                for(let step of steps){
+                    //debugger;
+                    if(isFirst){
+                        isFirst = false;
+                        points.push(new L.LatLng(step.start_location.lat, step.start_location.lng));
+                    }
+                    points.push(new L.LatLng(step.end_location.lat, step.end_location.lng));
+                }
+                var polyLine = new L.polyline(points, {
+                    color: 'red',
+                    weight: 3,
+                    opacity: 0.5,
+                    smoothFactor: 1
+                });
+                polyLine.addTo(this.mymap);
+            }
         }
-
-        mymap.on('click', onMapClick);
-
-        // mymap.on('contextmenu',function(){
-        //     let p = L.popup();
-        //     p.setContent('<p>Hello world!<br />This is a nice popup.</p>'); 
-        //     p.openOn(mymap);
-        // });
     }
 
     render() {
